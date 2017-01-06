@@ -1,4 +1,4 @@
-# H1 Install
+# Install
 
 ```
 git clone git://github.com/donchev7/dotfiles ~/dotfiles
