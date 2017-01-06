@@ -1,0 +1,27 @@
+[user]
+    name        = Bobby Donchev
+    email       = contact@donchev.is
+[color]
+    ui          = auto
+[diff]
+    renames     = copies
+[core]
+    autocrlf    = false
+    safecrlf    = true
+[alias]
+    unstage     = reset HEAD --
+    bi          = bisect
+    st          = status -s
+    ci          = commit
+    co          = checkout
+    s           = submodule
+    br          = branch
+    rb          = rebase
+    diffs       = diff --staged
+    remotev     = remote -v
+    glog        = log --graph --decorate --all
+    lg          = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d %Creset%s %Cgreen(%an %cr)%Creset' --abbrev-commit --date=relative
+    lga         = log --all --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d %Creset%s %Cgreen(%an %cr)%Creset' --abbrev-commit --date=relative
+    recent      = for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short) %(committerdate:relative)'
+[github]
+    user = donchev7
