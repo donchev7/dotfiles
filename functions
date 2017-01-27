@@ -24,7 +24,10 @@ calc() {
 killp() {
    ps auxww | grep $1 | awk '{print $2}' | xargs kill -9
 }
-
+# Docker stats for all running containers
+dockerstats(){
+   docker ps -q | xargs docker stats
+}
 # Create a new directory and enter it
 mkd() {
 	mkdir -p "$@"
