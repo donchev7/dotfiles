@@ -1,0 +1,101 @@
+ # Compiled source #
+###################
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Temporary files #
+###################
+*.swp
+*.swo
+*~
+
+# Packages #
+############
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite
+
+# OS generated files #
+######################
+.DS_Store*
+ehthumbs.db
+Icon?
+Thumbs.db
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+
+# C extensions
+*.so
+
+# Distribution / packaging
+node_modules/
+bin/
+build/manifest.json
+develop-eggs/
+dist/
+eggs/
+parts/
+sdist/
+var/
+npm-debug.log
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+.coverage
+.cache
+
+# Translations
+*.mo
+
+# Sphinx documentation
+docs/_build/
+
+# OS and editor files
+.DS_Store
+*/**.DS_Store
+._*
+.*.sw*
+*~
+.idea/
+.mr.developer.cfg
+.project
+.pydevproject
+*.tmproj
+*.tmproject
+tmtags
+
+# App ignores.
+instance/settings.py
+.vscode/
+deploy/
+data/
+*.pkl
+.vscode/
+
+celerybeat.bid
+celerybeat-schedule
+instance
+instance/
