@@ -1,6 +1,6 @@
 #!/bin/bash
 
-case $(cat /sys/class/power_supply/BAT?/status | tail -1) in
+case $(cat /sys/class/power_supply/BAT?/status | head -1) in
    Full) echo "-";;
    Discharging) echo "v";;
    Charging) echo "^";;
