@@ -1,5 +1,78 @@
 #!/bin/bash
 
+awsenv() {
+    echo "export AWS_ACCESS_KEY_ID=$1 && export AWS_SECRET_ACCESS_KEY=$2"
+}
+# based on the "patch deployment" strategy in this comment:
+# https://github.com/kubernetes/kubernetes/issues/13488#issuecomment-372532659
+
+istio() {
+   source ~/Downloads/istio-1.2.4/tools/_istioctl
+}
+
+function keyvault-value() {
+  echo
+  az keyvault secret show --vault-name $1 --name $2 --query 'value' --output tsv
+  echo
+}
+
+function pyclean() {
+  find $1 -name '*.pyc' -exec rm -f {} +
+  find $1 -name '*.pyo' -exec rm -f {} +
+  find $1 -name '*~' -exec rm -f {} +
+  find $1 -name .cache -exec rm -rf {} +
+  find $1 -name .pytest_cache -exec rm -rf {} +
+  find $1 -name __pycache__ -exec rm -rf {} +
+}
+
+function backup() {
+  FILENAME=/home/bobby2/backup/backup_`date +%Y.%m.%d`.tar.gz
+  NUM_FILES_TO_KEEP=2
+  echo "running rsync"
+  rsync -avzS --no-links --delete --exclude-from=/home/bobby/backup-blacklist.conf /home/bobby /home/bobby2
+  echo "done running rsync"
+ 
+  echo "compressing the data"
+  tar czf $FILENAME /home/bobby2/bobby
+
+  rm -f `ls -t /home/bobby2/backup/backup_*.tar.gz | awk "NR>$NUM_FILES_TO_KEEP"`
+  gsutil -m rsync -e -r -d /home/bobby2/backup gs://lenovo-mint
+}
+
+function refresh-all-pods() {
+  echo
+  DEPLOYMENT_LIST=$(kubectl -n $1 get deployment -o json|jq -r .items[].metadata.name)
+  echo "Refreshing pods in all Deployments"
+  for deployment_name in $DEPLOYMENT_LIST ; do
+    TERMINATION_GRACE_PERIOD_SECONDS=$(kubectl -n $1 get deployment "$deployment_name" -o json|jq .spec.template.spec.terminationGracePeriodSeconds)
+    if [ "$TERMINATION_GRACE_PERIOD_SECONDS" -eq 30 ]; then
+      TERMINATION_GRACE_PERIOD_SECONDS='31'
+    else
+      TERMINATION_GRACE_PERIOD_SECONDS='30'
+    fi
+    patch_string="{\"spec\":{\"template\":{\"spec\":{\"terminationGracePeriodSeconds\":$TERMINATION_GRACE_PERIOD_SECONDS}}}}"
+    kubectl -n $1 patch deployment $deployment_name -p $patch_string
+  done
+  echo
+}
+
+cgit() {
+  c_repos=$(find . -maxdepth 2 -name .git -type d -print | cut -d'/' -f2)
+  c_basedir=${PWD}
+
+  for repo in ${c_repos}; do
+    echo "## [${repo}] "
+    git --git-dir="${c_basedir}/${repo}/.git" \
+      --work-tree="${c_basedir}/${repo}" \
+      "$@"
+    echo -e ""
+  done
+}
+
+ns() {
+   kubectl config set-context $(kubectl config current-context) --namespace $1
+}
+
 # Simple calculator
 calc() {
 	local result=""
@@ -24,6 +97,23 @@ calc() {
 killp() {
    ps auxww | grep $1 | awk '{print $2}' | xargs kill -9
 }
+
+decode () {
+	  echo "$1" | base64 -d ; echo
+}
+
+encode () {
+	echo -n "$1" | base64 ; echo
+}
+
+view-secret() {
+  kubectl -n $1 get secret $2 -o json | jq -r '.data | values[]' | awk '{ print "echo " $1 " | base64 -d ; echo \n" }' | xargs -n 1 -I % sh -c '%'
+}
+
+logs() {
+  kubectl logs -f -n $1 -l app=$1 --max-log-requests 5 --all-containers=true
+}
+
 # Docker stats for all running containers
 dockerstats(){
    docker ps -q | xargs docker stats
@@ -90,7 +180,7 @@ fs() {
 # Use Git’s colored diff when available
 hash git &>/dev/null
 if [ $? -eq 0 ]; then
-	diff() {
+	gitdiff() {
 		git diff --no-index --color-words "$@"
 	}
 fi
@@ -212,7 +302,7 @@ repo() {
 		fi
 
 		echo "$giturl"
-		open "$giturl"
+		x-www-browser "$giturl"
 	fi
 }
 
@@ -243,3 +333,4 @@ openimage() {
 		--image-bg black \
 		--start-at "$file"
 }
+

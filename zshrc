@@ -6,16 +6,22 @@ export ZSH=/home/bobby/.oh-my-zsh
 export PROMPT_EOL_MARK=""
 export PATH=$PATH:/home/bobby/Projects/git-aliae/bin
 export SUBSCRIPTION_ID=e093d971-3907-4ae4-9221-d7994f3e6acb
-
+export GOPATH=$HOME/Projects/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:/usr/local/texlive/2018/bin/x86_64-linux
+export PATH=$PATH:/opt/mvn/apache-maven-3.6.1/bin
+export AZURE_CORE_COLLECT_TELEMETRY=False
 # Set name of the theme to load. Optionally, if you set this to "random"
 # it'll load a random theme each time that oh-my-zsh is loaded.
 # See https://github.com/robbyrussell/oh-my-zsh/wiki/Themes
 ZSH_THEME="oxide"
 tmux source-file ~/.tmux.conf
 
-ENABLE_CORRECTION="true"
 COMPLETION_WAITING_DOTS="true"
 DISABLE_UNTRACKED_FILES_DIRTY="true"
+
 
 #if which tmux 2>&1 >/dev/null; then
 #  if [ $TERM != "screen-256color" ] && [  $TERM != "screen" ]; then
@@ -23,11 +29,13 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 #  fi
 #fi
 export EDITOR='vim'
+setopt nosharehistory
 
-VIRTUALENVWRAPPER_PYTHON="/usr/bin/python3"
-PROJECT_HOME="/home/bobby/Projects"
-
-
+export VIRTUALENVWRAPPER_PYTHON="/usr/local/bin/python3.7"
+export VIRTUALENV_PYTHON="/usr/local/bin/python3.7"
+export PROJECT_HOME="/home/bobby/Projects"
+source /usr/local/bin/virtualenvwrapper.sh
+# source ~/Downloads/istio-1.2.4/tools/_istioctl
 #source /home/uidn6484/.local/bin/virtualenvwrapper.sh
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -52,6 +60,7 @@ function precmd () {
   echo -ne "$window_title"
 }
 bindkey -s '^G' ' | grep '
+# bindkey '^R' history-incremental-search-backward
 # Show the entries in a directory whenever you cd in
 function chpwd {
 	ls --color=auto
@@ -71,6 +80,8 @@ function chpwd {
 # stamp shown in the history command output.
 # The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
 HIST_STAMPS="dd.mm.yyyy"
+export HISTFILE=~/.zsh_history
+
 
 # Would you like to use another custom folder than $ZSH/custom?
 # ZSH_CUSTOM=/path/to/new-custom-folder
@@ -79,13 +90,15 @@ HIST_STAMPS="dd.mm.yyyy"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git z kubectl npm tmux)
+plugins=(git z tmux kubectl zsh-syntax-highlighting kubetail)
 
 DEFAULT_USER="{I}"
 
 source $ZSH/oh-my-zsh.sh
 source $ZSH/plugins/tmux/tmux_pane_words.zsh
-
+source $ZSH/plugins/zsh-kubectl-prompt/kubectl.zsh
+RPROMPT='%{$fg[4A4543]%}($ZSH_KUBECTL_PROMPT)%{$reset_color%}'
+zstyle ':zsh-kubectl-prompt:' separator '|'
 # User configuration
 
 # export MANPATH="/usr/local/man:$MANPATH"
@@ -115,28 +128,54 @@ source $ZSH/plugins/tmux/tmux_pane_words.zsh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 alias ip="curl -s http://checkip.dyndns.com/ | sed 's/[^0-9\.]//g'"
+alias jet="/opt/jetbrains/idea-IU-192.6817.14/bin/idea.sh"
+alias theme="wget -O gogh https://git.io/vQgMr && chmod +x gogh && ./gogh && rm gogh"
 alias httpdump="sudo tcpdump -i eth0 -n -s 0 -w - | grep -a -o -E \"Host\: .*|GET \/.*\""
 alias localip="ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'"
 alias folder="xdg-open ."
 alias gb="git branch"
 alias gbr="git branch -r"
 alias gs="git status"
+alias gac="git add . && git commit -m"
 alias h="history"
 alias pss="ps -ef"
 alias donchev="ssh -i ~/.ssh/WNL_key bobby@donchev.is -p 7447"
 alias donchevproxy="~/Desktop/WNLtunnel.sh"
-alias azure="az login --tenant thatisnomoon.io"
 alias kc="kubectl"
 alias clip="xclip -selection c"
 alias paste="xclip -selection c -o"
 alias context="kc config use-context"
-
+alias untar="tar -zxvf "
+alias getpass="openssl rand -base64 20"
+alias sha="shasum -a 256 "
+alias tail="kubetail"
 source ~/.functions
 
-
+setopt nosharehistory
 # Nodejs
-export NODEJS_HOME=/usr/local/lib/nodejs/node-v8.10.0
-export PATH=$NODEJS_HOME/bin:$PATH
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+autoload -U add-zsh-hook
+load-nvmrc() {
+  local node_version="$(nvm version)"
+  local nvmrc_path="$(nvm_find_nvmrc)"
+
+  if [ -n "$nvmrc_path" ]; then
+    local nvmrc_node_version=$(nvm version "$(cat "${nvmrc_path}")")
+
+    if [ "$nvmrc_node_version" = "N/A" ]; then
+      nvm install
+    elif [ "$nvmrc_node_version" != "$node_version" ]; then
+      nvm use
+    fi
+  elif [ "$node_version" != "$(nvm version default)" ]; then
+    echo "Reverting to nvm default version"
+    nvm use default
+  fi
+}
+add-zsh-hook chpwd load-nvmrc
+load-nvmrc
+
 #NPM_PACKAGES="/home/bobby/.npm-packages"
 #PATH="$NPM_PACKAGES/bin:$PATH"
 #unset MANPATH
@@ -144,3 +183,21 @@ export PATH=$NODEJS_HOME/bin:$PATH
 #export PATH=~/.npm-global/bin:$PATH
 #export PATH=$PATH:/usr/local/go/bin
 #export GOPATH=$(go env GOPATH)
+fpath=(~/.zsh.d/ $fpath)
+
+[ -s "/home/bobby/.scm_breeze/scm_breeze.sh" ] && source "/home/bobby/.scm_breeze/scm_breeze.sh"
+
+command -v vg >/dev/null 2>&1 && eval "$(vg eval --shell zsh)"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/bobby/google-cloud-sdk/path.zsh.inc' ]; then . '/home/bobby/google-cloud-sdk/path.zsh.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/bobby/google-cloud-sdk/completion.zsh.inc' ]; then . '/home/bobby/google-cloud-sdk/completion.zsh.inc'; fi
+
+export PATH="$HOME/.jenv/bin:$PATH"
+eval "$(jenv init -)"
+export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh

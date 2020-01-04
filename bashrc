@@ -1,7 +1,6 @@
-#!/bin/bash
-#
-# Bobby Donchev contact@donchev.is 
-# Linux Bash Profile
+# ~/.bashrc: executed by bash(1) for non-login shells.
+# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+# for examples
 
 # If not running interactively, don't do anything
 case $- in
@@ -9,30 +8,20 @@ case $- in
       *) return;;
 esac
 
-if [[ -f "${HOME}/.bash_profile" ]]; then
-	# shellcheck source=/dev/null
-	source "${HOME}/.bash_profile"
-fi
-
+# don't put duplicate lines or lines starting with space in the history.
+# See bash(1) for more options
 HISTCONTROL=ignoreboth
 
+# append to the history file, don't overwrite it
 shopt -s histappend
 
 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-#
-export HISTSIZE=100000
-export HISTFILESIZE=409600
-export HISTIGNORE="cd:ls:[bf]g:clear:exit:gp:gs:ll"
-export HISTCONTROL=ignoredups
-
-# Tab completion for ssh hosts, from known_hosts
-if [ -f ~/.ssh/known_hosts ]; then
-  complete -W "$(echo `cat ~/.ssh/known_hosts | cut -f 1 -d ' ' | sed -e s/,.*//g | uniq | grep -v "\["`;)" ssh
-fi
+HISTSIZE=10000
+HISTFILESIZE=2000
 
 # check the window size after each command and, if necessary,
 # update the values of LINES and COLUMNS.
-shopt -s checkwinsize
+sudo chsh -s "$(command -v zsh)" "${USER}"opt -s checkwinsize
 
 # If set, the pattern "**" used in a pathname expansion context will
 # match all files and zero or more directories and subdirectories.
@@ -102,6 +91,10 @@ fi
 # colored GCC warnings and errors
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
 
 # Add an "alert" alias for long running commands.  Use like so:
 #   sleep 10; alert
@@ -131,13 +124,10 @@ if [ -x /usr/bin/mint-fortune ]; then
      /usr/bin/mint-fortune
 fi
 
-killp() {
-   ps auxww | grep $1 | awk '{print $2}' | xargs kill -9
-}
+[ -s "/home/bobby/.scm_breeze/scm_breeze.sh" ] && source "/home/bobby/.scm_breeze/scm_breeze.sh"
 
-export CUDA_HOME=/usr/local/cuda
-export DYLD_LIBRARY_PATH="$DYLD_LIBRARY_PATH:$CUDA_HOME/lib"
-export PATH="$CUDA_HOME/bin:$PATH"
-VIRTUALENVWRAPPER_PYTHON='/usr/bin/python3' # This needs to be placed before the virtualenvwrapper command
-source /usr/local/bin/virtualenvwrapper.sh
-PROJECT_HOME='/home/bobby/Documents/Projects' # This needs to be placed before the virtualenvwrapper command as well
+
+
+command -v vg >/dev/null 2>&1 && eval "$(vg eval --shell bash)"
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash

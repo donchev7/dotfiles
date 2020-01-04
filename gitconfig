@@ -1,49 +1,47 @@
+[push]
+	default = simple
 [user]
-    name        = Bobby Donchev
-    email       = contact@donchev.is
+	name = donchev7
+	email = contact@donchev.is
 
-[color]
-    ui          = auto
+[includeIf "gitdir:~/Projects/ambidexter/**"]
+	path = ~/Projects/ambidexter/.gitconfig
 
-[color "branch"]
-    current     = yellow bold
-    local       = green bold
-    remote      = cyan bold
+[includeIf "gitdir:~/Projects/yunar/**"]
+	path = ~/Projects/yunar/.gitconfig
 
-[color "diff"]
-    meta        = yellow bold
-    frag        = magenta bold
-    old         = red bold
-    new         = green bold
-    whitespace  = red reverse
+[includeIf "gitdir:~/Projects/nomoon/**"]
+	path = ~/Projects/nomoon/.gitconfig
 
-[color "status"]
-    added       = green bold
-    changed     = yellow bold
-    untracked   = red bold
+[includeIf "gitdir:~/Projects/tomcode/**"]
+	path = ~/Projects/tomcode/.gitconfig
 
-[diff]
-    renames     = copies
+[includeIf "gitdir:~/Projects/autoticket/**"]
+	path = ~/Projects/autoticket/.gitconfig
 
-[core]
-    autocrlf    = false
-    safecrlf    = true
-    excludesfile = ~/.gitignore
- 
+[includeIf "gitdir:~/Projects/vaillant/**"]
+	path = ~/Projects/vaillant/.gitconfig
+
+
 [alias]
-    unstage     = reset HEAD --
-    bi          = bisect
-    st          = status -s
-    ci          = commit
-    co          = checkout
-    s           = submodule
-    br          = branch
-    rb          = rebase
-    diffs       = diff --staged
-    remotev     = remote -v
-    glog        = log --graph --decorate --all
-    lg          = log --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d %Creset%s %Cgreen(%an %cr)%Creset' --abbrev-commit --date=relative
-    lga         = log --all --graph --pretty=tformat:'%Cred%h%Creset -%C(yellow)%d %Creset%s %Cgreen(%an %cr)%Creset' --abbrev-commit --date=relative
-    recent      = for-each-ref --count=10 --sort=-committerdate refs/heads/ --format='%(refname:short) %(committerdate:relative)'
-[github]
-    user = donchev7
+	st = status
+	co = checkout
+	ci = commit
+	br = branch
+	df = diff
+	lg = log -p
+	rso = remote show origin
+	me = config user.name
+	smash = !git ir
+	ir = !sh -c 'git rebase -i origin/${1-master}'
+	soft = reset --soft HEAD^
+	up = !git pull --rebase --prune --autostash --recurse-submodules
+        llog = !git log --pretty=format:'%Cgreen(%ci)%Creset %Cred%h%Creset %<(20,trunc)%C(blue)%an%Creset  %s %C(yellow)%d%Creset ' --abbrev-commit
+	all = !git log --pretty=oneline --abbrev-commit --all --no-merges
+        today = !git llog --since='12am' --all --no-merges --committer=\"`git me`\"
+	yesterday = !git llog --since='yesterday 12am' --until='12am' --all --no-merges --committer=\"`git me`\"
+	today-all = !git llog --since='12am' --all --no-merges
+	yesterday-all = !git llog --since='yesterday 12am' --until='12am' --all --no-merges
+	up-log = !sh -c 'logstart=$(git rev-parse HEAD) && git pull --rebase --recurse-submodules --prune --autostash && echo "" && git --no-pager llog ${logstart}.. --stat'
+	prdone = !sh -c 'git co ${1-master} && git up && git clean-merged'
+	clean-merged = "!git branch --merged | grep -v '\\^\\*\\|master' | xargs -n 1 git branch -d"
