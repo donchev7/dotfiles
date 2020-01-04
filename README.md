@@ -6,4 +6,4 @@ cd ~/dotfiles
 chmod +x install.sh
 ./install.sh
 ```
-
+dconf load /org/cinnamon/desktop/keybindings/ < dconf-settings.conf
