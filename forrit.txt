@@ -1,0 +1,27 @@
+chrome
+docker
+docker-compose
+kubectl
+python3.7
+aws-cli
+azure cli
+gcp cli
+helm
+istioctl
+dbeaver
+inteliJ
+vscode
+vim
+gparted
+tmux
+zsh
+nvm
+virtualenvwrapper / pipenv
+jshell
+java aws corretto 8 / 11
+slack
+teams for linux
+spotify client
+remmina
+octant
+
